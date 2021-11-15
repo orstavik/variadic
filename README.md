@@ -4,7 +4,9 @@
 
 # HowTo: use variadic functions in JS?
 
-## 1. What does a variadic function look like?
+## 1 What is variadic functions
+
+### 1.1 What does a variadic function look like?
 
 Variadic functions *should* have **a variadic signature**. In ES6 a variadic signature is written using the rest operator `...`.
 
@@ -30,7 +32,7 @@ function sum(num1, num2) {      //classic JS
 
 The problem with "old-school" variadic function declaration is that it didn't syntactically signal in the function signature that it is variadic and which arguments it has. It is therefore always preferable to declare variadic functions in ES6 syntax. Here, the syntax itself *explains* your function's intended use and behavior so you don't have to document it.
 
-## 2. How to use a variadic function?
+### 1.2 How to use a variadic function?
 
 To invoke a variadic function, you need to pass it a list of arguments. This can be **written** in the code in two ways: the "call" and the "apply" way.
 
@@ -48,7 +50,7 @@ The "apply" way is invoking a function and using the `...` on one or more of its
 
 > For most JS developers both "call"ing and "apply"ing is second nature. We do it all the time, like fish in water. But, at the same time, to "call" and "apply" are to different syntactic ways to invoke a function in JS. It is using verbs in different tenses: like if you do `[].push(1);` it's the equivalent of saying "I push one", while `[].push(...aList)` is like saying "I am pushing a list". Very similar, yet also very different. 
 
-## 3. What does a variadic function look like inside?
+### 1.3 What does a variadic function look like inside?
 
 Inside the variadic function there needs to be at least *two* things:
 
@@ -59,7 +61,7 @@ Why always loop? Variadic functions don't know how many arguments it gets. It co
 
 Why always an inner action? It is no point in making an iteration if we don't do anything at each step of that iteration.
 
-## Anti-pattern "false-variadic"
+### 1.4 Anti-pattern "false-variadic"
 
 To see why this should be considered a *rule*, and not the *norm*, we can do the opposite: For example, we can make a function with a variadic signature that doesn't loop:
 
@@ -76,7 +78,7 @@ function notVariadic(...args) {
 
 Such a function looks rather dumb. Why didn't it instead make its signature `notVariadic(arg0, arg1, arg2, arg3)`? You could still use the spread operator on the outside. And what if you only passed in a list with 2 items? or 2000? The signature is confusing because it kinda suggests you should do that, it gives the wrong impression. So, no, this is not how it's done. If you don't iterate over the `...args`, then you shouldn't have a function signature that says that is going to happen. And if you do, then it is an anti-pattern that we can call "false-variadic".
 
-## Anti-pattern "hot air iteration"
+### 1.5 Anti-pattern "hot air iteration"
 
 A variadic function with iteration only and no inner action looks dumb too. It produces nothing but air. Hot air from the processor:
 
@@ -87,7 +89,7 @@ function hotAir(...args) {
 }
 ```
 
-## The contract of a variadic function 
+### 1.6 The contract of a variadic function 
 
 The **variadic function** is therefore a contract that has two components:
 
@@ -96,7 +98,9 @@ The **variadic function** is therefore a contract that has two components:
 
 I cannot stress the importance of this point. Variadic doesn't just mean external variadic signature, but also internal "variadic behavior". The point of the discussion is: what is good and bad variadic behavior? When should a variadic signature be used, and not?
 
-## Pattern 1: static variadic functions
+## 2 Variadic patterns
+
+### 2.1 Pattern: static variadic functions
 
 The `function plus(...args)` above is an example of a static variadic function. Static variadic functions is the simplest and best pattern for variadic functions. If there are no other compelling reasons for making your functions otherwise, then choose this pattern. It is good.
 
@@ -117,7 +121,7 @@ Math.min(1, 2, 3, 4);      //1
 Math.min(...[1, 2, 3, 4]); //1
 ``` 
 
-## Pattern 2: variadic methods
+### 2.2 Pattern: variadic methods
 
 A method is a function that is associated with an object. The methods/functions are associated with an object because it either reads or writes to the state of `this` object. And methods can also be variadic.
 
@@ -140,7 +144,7 @@ const ar = [1, 2, 3];  //ar => [1,2,3]
 ar.push(...[4, 5, 6]); //ar => [1,2,3,4,5,6]
 ```
 
-## reverse variadic loops
+### 2.3 Reverse variadic loops
 
 `array.unshift()` is another interesting variadic method, because it uses a slightly different variadic loop: **item by item reverse**. 
 
@@ -159,7 +163,7 @@ ar.unshift(...[4, 5, 6]); //ar => [4,5,6,1,2,3]
 
 The above is a naive, inefficient implementation of `unshift`.  The purpose is to illustrate the variadic principle that governs the loop and the inner action.
 
-## nested variadic loops
+### 2.4 Recursive variadic loops
 
 `DocumentFragment.append()` is a variadic method whose loop runs front to back, but that in addition will **recurse into nested sequences (documentFragment arguments) *one* level deep**. The recursion algorithm behaves not unlike `array.flat(1)`.
 
@@ -209,7 +213,7 @@ function Array_flattenDeep(...itemOrNestedArray) {
 }
 ```
 
-## The meaning of variadic loop extraction
+### 2.5 What is variadic loop extraction?
 
 Variadic loop extraction is best understood starting with an example:
 
@@ -263,7 +267,7 @@ for (let i = 0; i < sequence.length; i++)
 console.log(target1, target2, target3);
 ```
 
-## Non-extractable variadic loops
+### 2.6 Non-extractable variadic loops
 
 So, are all variadic loops extractable? Or are there some variadic functions where we *cannot* extract the loop? Yes. And they can look like this:
 
@@ -290,7 +294,7 @@ In this example a variadic `push()` method is provided. The inner loop of this `
 
 The secondary consequence of this, is that the *use* of `WeirdList` is now also **restricted** to the "apply" way of invoking the `push()` method. If the only thing you have is a variable pointing to a list, then you **must** use the spread operator to add it. The other patterns that we have looked at so far also benefits and encourages you to use the `...` operator. But, if you want, you **can always** extract the inner loop and "call" the variadic function as if it was its inner action only.
 
-## But why is variadic extraction important?
+### 2.7 Why is variadic extraction important?
 
 1. **Useful**. As in "full of use cases": one function covers many and varied use-cases. Without being messy. For example, `array.push()` has an extractable loop. That means that you can "apply" it directly with `...` *and* decompose its behavior so as to combine your own inner actions to the mix, or make your own twist to the loop.
 
@@ -319,11 +323,11 @@ ar.push([7, 8, 9].slice(0, 8 - ar.length));
 
    All this tradition, combined with the other three positive aspects listed above, they *all* make us assume that a JS function can *always* be used from "call". The soft syntactic rule is that *all functions can always be both called and applyed*. Including variadic functions. Thus, as a JS developer, you would expect that a variadic function can be used from "call", and thus you would expect that it has an extractable loop. Break this traditioin, and you make lots of developers that follow this rule *guess wrong*. Making non-extractable variadic functions is breaking with tradition and inconsistent with established soft syntactic rules of JS.
 
-## Anti-patterns
+## 3 Anti-patterns
 
 Do you feel these things are difficult? Yeah.. You are not alone! One week ago I actually googled "variadic" to see precisely what it meant, 'cause I only felt a pattern was off, and I didn't yet know exactly how (although I should probably also mention that I have used and written variadic functions for a long time, so as not to pretend otherwise:). These things are hard. Even the experts' experts make mistakes here. So. Let's take some comfort in that and look at the mistakes/anti-patterns that are legacy and even *still being added(!)* in the browsers.
 
-## Anti-pattern: static-looking variadic method
+### 3.1 Anti-pattern: static-looking variadic method
 
 We start with an example that illustrate the potential confusion that can come when using `Object.assign`:
 
@@ -374,7 +378,7 @@ console.log(a);       //  {a: 1, b: 1, c: 1};  expectedly
 console.log(a === c); //  true, obviously
 ```
 
-## Anti-pattern #1: magic-trick-primitive
+### 3.2 Anti-pattern: magic-trick-primitive
 
 This anti-pattern is based on the `replaceChildren()` method in the JS library. We will illustrate this anti-pattern in a simplified form called `Oops`.
 
@@ -421,7 +425,7 @@ But. What about `append()` and `remove()`? Can't they replace `replace()`? Poten
 
 So, what kind of primitive is this? It's like a magician that takes a full glass of water behind the curtain, empties the water on the floor, fills the glass with M&Ms, says abracadabra, and then shows the birthday kids the glass with M&Ms to applause and anticipation of candy. The adults in the rooms first thoughts are: "that's primitive!! Who is going to clean up all that water?! And the wet glass is going to partially dissolve the M&Ms' glazing so the white, unwashable carpet the kids are sitting on will definitively be M&M colored... ahh, crab!".
 
-### Anti-pattern: caveman primitive
+### 3.3 Anti-pattern: caveman primitive
 
 The second anti-pattern is based on the new `HTMLSlotElement.assign()`. It is very similar to the magic-trick primitive, except that now you don't have `append()` and `remove()` get-out-of-jail-dirty-card. Here, there is **no way** to simulate variadic loop extraction. None. How does that work?
 
@@ -449,7 +453,7 @@ The consequence of this pattern is that your use-cases freeze up. You can only a
 
 Loop extraction open up for debugging. It opens up for the 100 use-cases you didn't think about when you first made the function. It opens up for freedom of choice. While at the same time preserving **conceptual consistency** and *almost identical* behavior using `...` the "apply" way. If a strong, robust caveman primitive is what you need, and there might be times for that too. But don't pretend a caveman is honoring the variadic contract.
 
-## How to spot a caveman and magic-trick primitive?
+### 3.4 How to spot a caveman and magic-trick primitive?
 
 So. How to avoid such patterns? After all, it really can be difficult spot, even experts' experts don't see it. Well, here are some clues: 
 
