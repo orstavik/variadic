@@ -50,7 +50,7 @@ The "apply" way is invoking a function and using the `...` on one or more of its
 
 > For most JS developers both "call"ing and "apply"ing is second nature. We do it all the time, like fish in water. But, at the same time, to "call" and "apply" are to different syntactic ways to invoke a function in JS. It is using verbs in different tenses: like if you do `[].push(1);` it's the equivalent of saying "I push one", while `[].push(...aList)` is like saying "I am pushing a list". Very similar, yet also very different.
 
-> Another good way to understand the difference between to "call" and to "apply" a function is to think of it as akin to the difference between "prototypes" and "classes". We can often use the concepts interchangeably, but there arise situations were a "class" cannot be viewed/written as a "prototype", and/or vice versa. Mostly, it makes no difference if we "apply" or "call" a function, or the best use is obvious in the situation. But on some rare occasion, that thing that makes the two concepts different suddenly pops up and becomes essential. 
+> Another good way to understand the difference between "to call" and "to apply" is as an analogy to the difference between "prototypes" and "classes". Often, we can often the two concepts interchangeably, but there arise situations were a "class" cannot be understood/written as a "prototype", and/or vice versa. Mostly, it makes no difference if we "apply" or "call" a function, or the best use is obvious in the situation. But on some rare occasion, that thing that makes the two concepts different suddenly pops up and becomes essential. 
 
 ### 1.3 What does a variadic function look like inside?
 
