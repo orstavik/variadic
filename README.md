@@ -292,7 +292,7 @@ The secondary consequence of this, is that the *use* of `WeirdList` is now also 
 
 ## But why is variadic extraction important?
 
-1. **Usefull**. As in use-case-full: one function covers many and varied use-cases. Without being messy. For example, `array.push()` has an extractable loop. That means that you can "apply" it directly with `...` *and* decompose its behavior so as to combine your own inner actions to the mix, or make your own twist to the loop.
+1. **Useful**. As in "full of use cases": one function covers many and varied use-cases. Without being messy. For example, `array.push()` has an extractable loop. That means that you can "apply" it directly with `...` *and* decompose its behavior so as to combine your own inner actions to the mix, or make your own twist to the loop.
 
 ```javascript
 const ar = [];
@@ -308,20 +308,20 @@ for (let n of [7, 8, 9]) {
 //The same iteration-twists written the "apply" way
 ar.push([7, 8, 9].slice(0, 8 - ar.length));
 
-//try to imagine a world were it is impossible to extract the loop of push()... 
+//imagine the run-time were it is impossible to extract the loop of push(). And no other means to add elements to arrays. 
 ```
 
-2. **Loop consistency**. When we extract the loop, we see it. We see the state it contains, the `i` (the `position` and `deleteCount` in `splice()`). We can see how it iterates, step by step. Extraction **proves** that nothing outside the loop interacts with the state of the loop. This is *why* variadic "looks good". It's not the three `...` that are beautiful per se (e.g. people don't seem to fawn over `...` in plain English texts...). The purity that an independent loop iterates over a set of elements and apply the same function to all, that is *why* we can trust it to produce fewer side-effects, race-conditions, curveballs. That is why we trust `...`. That is why "good variadic" functions feel conceptually sound.
+  2. **Loop consistency**. When we extract the loop, we see it. We see the state it contains, the `i` (the `position` and `deleteCount` in `splice()`). We can see how it iterates, step by step. And extraction **proves** that nothing outside the loop interacts with the state of the loop. This is *why* variadic "looks good". It's not the three `...` that are beautiful per se (e.g. people don't seem to fawn over `...` in plain English texts...). The purity that an independent loop iterates over a set of elements and apply the same function to all, that is *why* we can trust it to produce fewer side-effects, race-conditions, curveballs. That is why we trust `...`. That is why "good variadic" functions feel conceptually sound.
 
 3. **Debugability**. If you have a bug, then where is it? And why is it happening? Let's say that adding a set of nodes produce a set of callbacks. And that these callbacks in turn reads the state of the object with the variadic method. Now, if you want to debug these callbacks, you would like to step by step through the iteration that is around the inner action. If you get *a* bug in an automatic callback if you `push()` 5 elements to a weird list, then you likely want to a) extract the loop, b) step through it in devtools, c) look at the state at each point, d) follow the callbacks, until e) *before* the last step and inner action that triggers the bug. Then you understand what just happened and what you did.
 
-4. **Syntactic consistency**. JS is a language with a long tradition of *only* using "call" syntax to invoke functions. It was only with ES6 that the possibility to "apply"-invoke functions with `...` became available, and so all old functions can always be "call"ed. Furthermore, *many* JS developers also don't use, know or do not prefer spread. We can label them "old-timers stuck in their old ways" or "newbies that must be shown the right path". But that doesn't detract from the fact that there are still many out there. The old-timers and newbies create precedent too, cause we assume others want to attract them.
+4. **Syntactic consistency**. JS is a language with a long tradition of *only* using "call" syntax to invoke functions. It was only with ES6 that the possibility to "apply"-invoke functions with `...` became available, and so all old functions can always be "call"ed. Furthermore, *many* JS developers also don't use, know or disfavor spread. We can label them "old-timers stuck in their old ways" or "newbies that must be shown the right path". But that doesn't detract from the fact that there are still many out there. The old-timers and newbies create precedent too, cause we assume others want to attract them.
 
-   All this tradition, combined with the other three positive aspects listed above, they *all* make us assume that a JS function can *always* be used from "call". The soft syntactic rule is that *all functions can always be both called and applyed*. Including variadic functions. Thus, as a JS developer, you would expect that a variadic function can be used from "call", and thus you would expect that it has an extractable loop. Break that rule, and you make developers following this rule *guess wrong*. Making non-extractable variadic functions is breaking with tradition and inconsistent with established soft syntactic rules of JS.
+   All this tradition, combined with the other three positive aspects listed above, they *all* make us assume that a JS function can *always* be used from "call". The soft syntactic rule is that *all functions can always be both called and applyed*. Including variadic functions. Thus, as a JS developer, you would expect that a variadic function can be used from "call", and thus you would expect that it has an extractable loop. Break this traditioin, and you make lots of developers that follow this rule *guess wrong*. Making non-extractable variadic functions is breaking with tradition and inconsistent with established soft syntactic rules of JS.
 
 ## Anti-patterns
 
-Do you feel these things are difficult? Yeah.. You are not alone! One week ago I actually googled "variadic" to see precisely what it meant, 'cause I only felt a pattern was off, and I didn't yet know exactly how (Although I should probably also mention that I have used and written variadic functions for a long time, so as to not pretend otherwise:). These things are hard. Even the experts' experts make mistakes here. So. Let's take some comfort in that and look at the mistakes/anti-patterns that are legacy and even *still being added(!)* in the browsers.
+Do you feel these things are difficult? Yeah.. You are not alone! One week ago I actually googled "variadic" to see precisely what it meant, 'cause I only felt a pattern was off, and I didn't yet know exactly how (although I should probably also mention that I have used and written variadic functions for a long time, so as not to pretend otherwise:). These things are hard. Even the experts' experts make mistakes here. So. Let's take some comfort in that and look at the mistakes/anti-patterns that are legacy and even *still being added(!)* in the browsers.
 
 ## Anti-pattern: static-looking variadic method
 
@@ -340,7 +340,7 @@ console.log(c);   // {a: 1, b: 1, c: 1};
 
 These are two general, soft, syntactic expectations that `Object.assign()` (inadvertently) echo. And that is likely to make us expect that it also *behaves* as a pure, static variadic function.
 
-But. This is *not* how `Object.assign()` behaves. Most JS developers have run into `Object.assign()` and know the semantic rules are: the first parameter is special. All the properties of the remainder of the arguments are shallowly copied into the first parameter. And the first parameter is also what the variadic function returns:
+But. This is *not* how `Object.assign()` behaves. Most JS developers have run into `Object.assign()` and know its semantic rules: the first parameter is special; all the properties of the remainder of the arguments are shallowly copied into the first parameter; and the first parameter is also what the variadic function returns.
 
 ```javascript
 const a = {a: 1};
@@ -349,7 +349,7 @@ const c = Object.assign(a, b, {c: 1});
 console.log(a);     //  {a: 1, b: 1, c: 1};  surprisingly?
 console.log(b);     //  {b: 1};
 console.log(c);     //  {a: 1, b: 1, c: 1};  expectedly
-console.log(a === c); //  true                 surprisingly?
+console.log(a === c); //  true               surprisingly?
 ```
 
 This means that `Object.assign()` behaves consistently with a variadic method, something like this:
@@ -413,7 +413,7 @@ for (let n of [1, 2, 3])
   oops.append(n);            //+1+1+1         //list is 1,2,3
 ```
 
-**Conceptually**, `remove()` and `append()` are primitives, and `replace()` is a composition. There is nothing stopping you the human programmer from imagining that you can replace `replace()` by first `remove()` everything, and then `append()`ing. 1+1=2.
+**Conceptually**, `remove()` and `append()` are primitives, and `replace()` is a composition. There is nothing stopping you the human programmer from imagining that you can replace `replace()` by first `remove()` everything, and then `append()`ing. 1+1=2. Still.
 
 But. `Oops.replace()` is a variadic function that does *two* things. First, `Oops.replace(...args)` removes the old items from the list, and then it appends the new `args` one by one. It does two state mutations: first the old `this.#list` is cleaned and then the new `args` added. And only one action *can be* controlled by the loop. This means you can't extract the loop, because you will not manage to avoid doing the *before* action more than once. And because the variadic loop cannot be extracted, the variadic function becomes a primitive.
 
@@ -421,7 +421,7 @@ But. What about `append()` and `remove()`? Can't they replace `replace()`? Poten
 
 So, what kind of primitive is this? It's like a magician that takes a full glass of water behind the curtain, empties the water on the floor, fills the glass with M&Ms, says abracadabra, and then shows the birthday kids the glass with M&Ms to applause and anticipation of candy. The adults in the rooms first thoughts are: "that's primitive!! Who is going to clean up all that water?! And the wet glass is going to partially dissolve the M&Ms' glazing so the white, unwashable carpet the kids are sitting on will definitively be M&M colored... ahh, crab!".
 
-## Anti-pattern #1: caveman primitive
+### Anti-pattern: caveman primitive
 
 The second anti-pattern is based on the new `HTMLSlotElement.assign()`. It is very similar to the magic-trick primitive, except that now you don't have `append()` and `remove()` get-out-of-jail-dirty-card. Here, there is **no way** to simulate variadic loop extraction. None. How does that work?
 
@@ -440,23 +440,26 @@ const oops = new Oops();
 oops.assign(...[1, 2, 3]);  //#list = [1,2,3]
 oops.assign(...[1, 2, 3]);  //#list = [1,2,3]
 for (let n of [1, 2, 3])
-  oops.assign(n);         //#list = [3]
+  oops.assign(n);           //#list = [3]
 ```
 
-`Oops.assign()` mirrors `Auch.replace()`. Except here, there is no other. This time the magician also has a club and says in his caveman voice: "i am the only source of M&Ms and I am the only one who gets to empty water. A caveman primitive: "use me or sleep outside with the lions!"
+`Auch.assign()` mirrors `Oops.replace()`. Except here, there is no other partial alternative. This time the magician also has a club and says in his caveman voice: "i am the only source of M&Ms and I am the only one who gets to empty water. A caveman primitive: "use me or sleep outside with the lions!"
 
-The consequence of this pattern is that your use-cases freeze up. You can only add *all* the M&Ms at the same time. No chance filling half the glass with M&Ms and then telling the kids that they will get one M&M for each popcorn they pick out of the carpet until the glass is full. No chance telling the kids that if they pull the cats tail one more time, you will take 10 M&Ms out of the glass and eat'em. You can't say: "no M&Ms kids, until you have all drunk that glass of water". You are no longer in control of your use-cases.
+The consequence of this pattern is that your use-cases freeze up. You can only add *all* the M&Ms at the same time. You must ask the primitive caveman. No chance filling half the glass with M&Ms and then telling the kids that they will get one M&M for each popcorn they pick out of the carpet until the glass is full. No chance telling the kids that if they pull the cats tail one more time, you will take 10 M&Ms out of the glass and eat'em. You can't say: "no M&Ms kids, until you have all drunk that glass of water". You are no longer in control of your use(-case).
 
-Loop extraction open up for debugging. It opens up for the 100 use-cases you didn't think about when you first made the function. It opens up for freedom of choice. While at the same time preserving **conceptual consistency** and *almost identical* behavior using `...` the "apply" way. If a strong, robust caveman primitive is what you need, and there might be times for that too, then "sure, ok, but don't pretend that it is honoring the variadic contract."
+Loop extraction open up for debugging. It opens up for the 100 use-cases you didn't think about when you first made the function. It opens up for freedom of choice. While at the same time preserving **conceptual consistency** and *almost identical* behavior using `...` the "apply" way. If a strong, robust caveman primitive is what you need, and there might be times for that too. But don't pretend a caveman is honoring the variadic contract.
 
 ## How to spot a caveman and magic-trick primitive?
 
-Ok. So how to avoid such patterns? After all, it really is so difficult to spot that even experts' experts don't see it. Well, here are some clues: 
+So. How to avoid such patterns? After all, it really can be difficult spot, even experts' experts don't see it. Well, here are some clues: 
 
-1. It will be a variadic *method*. It *caaan* diguise itself as a static/pure function, ie. surprise you by causing unexpected state changes to global or some or all of its arguments, but that bug should have been spotted earlier.
+1. It will be a variadic *method*. It *caaan* diguise itself as a static/pure function, ie. surprise you by causing unexpected state changes to global or some or all of its arguments (as in `Object.assign()`), but that bug should have been spotted earlier.
 
 2. The variadic method will do *more* than *one* thing inside this method. The variadic method will do at least *one additional* action either *before* or *after* the loop.
 
-3. The *outside the loop* action(s) mutates state. (if it didn't, it would be considered part of the loop and the loop's state. Now, I would expect that a variadic method with a non-extractable loop *also* did state mutations in the action inside its main loop, but that is not necessary. As said earlier, it could be a method masquerading as a function.
+3. The *outside the loop* action(s) mutates state. If it didn't, it would be considered part of the loop's state. Now, I would guess that most variadic method with a non-extractable loop *also* did state mutations in its inner action, but this is not required. As said earlier, it could be a method just masquerading as a variadic function.
 
-4. The *outside the loop actions* are likely some kind of clean up or additional loops that make the method more efficient: "we need to do a) first, before we loop the args and do b)"; "we don't really need to do this operation at every step, it will be much more efficient if we do everything at the end". Something like this.
+4. The *outside the loop actions* are likely some kind of clean up or additional loops that make the method more efficient: "we need to do a) first, before we loop the args and do b)"; "we don't really need to do this operation at every step, it will be much more efficient if we do everything at the end". Something like that.
+
+
+Best of luck!
