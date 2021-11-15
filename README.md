@@ -1,8 +1,8 @@
-*This tutorial describes some good and bad design patterns for making variadic functions in JS. The tutorial sometimes follows a "simple first, expand later" principle. This should make for easy reading, but individual paragraphs may therefore not be 100% accurate on their own. Also, I try to be honest. I don't try to wrap my opinion is vague language. So, if you think I am wrong, you might very well be right.*
-
-*And. This is work in progress. I just try to get it out asap as I fear our loved one, the DOM, has just been involved in a minor accident. I love you guys. All of you. Please [shoot down the message, not at the messenger](https://www.thisamericanlife.org/753/failure-to-communicate/act-one-1) :)*
-
 # HowTo: use variadic functions in JS?
+
+This tutorial describes some good and bad design patterns for making variadic functions in JS. The tutorial sometimes follows a "simple first, expand later" principle. This should make for easy reading, but individual paragraphs may therefore not be 100% accurate on their own. Also, I try to be honest. I don't try to wrap my opinion is vague language. So, if you think I am wrong, you might very well be right.
+
+And. This is work in progress. I just try to get it out asap as I fear our loved one, the DOM, has just been involved in a minor accident. I love you guys. All of you. Please [shoot down the message, not at the messenger](https://www.thisamericanlife.org/753/failure-to-communicate/act-one-1) :)
 
 ## 1 What is variadic functions
 
