@@ -380,6 +380,58 @@ console.log(a);       //  {a: 1, b: 1, c: 1};  expectedly
 console.log(a === c); //  true, obviously
 ```
 
+### 3.2a: Anti-pattern: WYSINWYG variadic
+
+WYSINWYG as in "what you see is Not what you get"). Or `==`is not `===`. Or `==!=====`.
+
+This anti-pattern is based on the `append()` and `prepend()` methods in the JS library. We can illustrate it in simplified form as this:
+
+```javascript
+class FooledYou {
+  #list;
+  #actions;
+  
+  append(...nodes){
+    this.#actions.push(`appended ${nodes.length} nodes`);
+    for (let n of nodes)
+      this.#list.push(n);
+  }
+  
+  showMeNodes(){
+    return this.#list.slice();
+  }
+}
+
+const one = new FooledYou();
+one.append(1).append(2);
+one.showMeNodes(); //[1,2]
+
+const two = new FooledYou();
+two.append(1,2);
+two.showMeNodes(); //[1,2]
+```
+
+If you use `append()` sequentially (`call` way) or variadically (`apply` way) the *superficial* results are *identical*. You can literally *not* see any differences between the end states of `one` and `two` using public methods on the object that has been mutated. In JS speak, `obj.append(1).append(2) == obj.append(1,2)`.
+
+But. Double-equals is not the same as tripple-equals. And, in the case of `obj.append(1).append(2)` vs `obj.append(1,2)` there are *side-effects* that do *not* match exactly. If you use `append()` the `call` way, the `#actions` list is populated with *two* entries: `["appended 1 nodes", "appended 1 nodes"]`; when `append()` is `apply`ed, then `#actions` equals `["appended 2 nodes"]`. I JS speak `obj.append(1).append(2) !== obj.append(1,2)`.
+
+Now, in the defence of an `append()` method, there will most likely be some good practical reasons why the method is implemented this way. For example,
+the internal mechanisms of mutation, ie. `#list.push()`, is much more efficient when the nodes are added in bulk than one after the other. Or, in use-cases where many elements are added together, it might make more sense that the side-effects reflect that change.
+
+But. Still. If you look superficially at the two processes, they produce the same output. "what you see" is `obj.append(1).append(2) == obj.append(1,2)`. And, most often as you don't rely on subtle differences in the side-effects, `obj.append(1).append(2) == obj.append(1,2)` is for the most part also "what you get". Except, in some edge-cases where the nuance of the side-effects suddenly become important. Now, in these situations, "what you see" looking at the two processes superficially is *still* `obj.append(1).append(2) == obj.append(1,2)`, but now *also* `obj.append(1).append(2) !== obj.append(1,2)` has also become important.
+
+There is wide concensus that the JS distinction between `==` and `===` is considered an anti-pattern. For example, most IDE *always* warn developers when they use `==` by default. Why is that? 
+
+Well, let's begin with what the problem is not. The problem with `==` `!==` `===` is *not* that this distinction cannot be made: the JS interpreter *do* make this disctinction. The problem with `===` is *not* that such a grammatical rule cannot be *internally* consistent: again, the JS interpreters manage to write the run-time that never internally confuse `==` with `===`, and spec the distinction too. 
+
+The problem *is* that the *human JS developer **by default** expects `==` to mean `===`*. Why is that? Well, the cognitive machinery of the human mind *expects* WYSIWYG. Even if *told* that up is down, the human mind simply cannot understand what it is like to be weightless in a spaceship until he/she experiences it. If two solutions are presented as equal, often enough, then the human simply assumes that they are. You see 999 white swans, now the human think that the next swan is white. And how many swans do you need? 1000? 100? 10? or just 1 or 2? The more swans you see, the more strongly the belief will be held. However, to create a new belief and see a new pattern, the human mind do not need many examples.
+
+The problem *is* that the developer does *not* really learn programming from text books. The developer mostly learn programming and language by trial and error. A human learning to program is more like a human learning to ride a bike, than a computer being loaded with a text-book of rules. It doesn't really matter if the text-book or platform *defines* that `==` is different from `===` if the human hardware stumbling into the problem *continuously* and *stubbornly* consists that WYSIWIG and equal-is-equal.
+
+Finally, the problem *is* that the JS language is *not alone in the world*. The developer comes from *other* and *differing* linguistic backgrounds such as English, Python, algebra from school, PHP. In fact, very very few humans learn JS as their *first* language, even in 2021. So, if other linguistic systems fighting for headspace in the developers mind treat the concept of variadic as `==` `===` `===`, and not to mention if other JS variadic methods treat the output from `call` and `apply` as `===`, then you are essentially *doomed* to work either *with* or *against* that expectation from your users.
+
+So. You *can* make a rule that says `obj.append(1).append(2) !== obj.append(1,2)`, even as WYSIWYG says that `obj.append(1).append(2) === obj.append(1,2)`. But, in the ecosystem that is *your variadic function in use*, ie. the sum total of your variadic function *and* all the apps and scripts that use it, you will get *lots of inconsistencies*. Because the hardware in the human mind cannot easily be reprogrammed to WYSINWYG. And because WYSINWYG is the pattern that your variadic function follows.
+
 ### 3.2 Anti-pattern: magic-trick-primitive
 
 This anti-pattern is based on the `replaceChildren()` method in the JS library. We will illustrate this anti-pattern in a simplified form called `Oops`.
