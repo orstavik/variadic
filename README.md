@@ -382,9 +382,9 @@ console.log(a === c); //  true, obviously
 
 ### 3.2a: Anti-pattern: WYSINWYG variadic
 
-WYSINWYG as in "what you see is Not what you get"). Or `==`is not `===`. Or `==!=====`.
+WYSINWYG as in "what you see is Not what you get"). Or `==`is not `===`. Or `(==)!==(===)`. Or [`¯\(°_o)/¯`](https://knowyourmeme.com/memes/i-dunno-lol-_o).
 
-This anti-pattern is based on the `append()` and `prepend()` methods in the JS library. We can illustrate it in simplified form as this:
+This anti-pattern is based on the `append()` and `prepend()` methods in the JS library, simplified in the following example:
 
 ```javascript
 class FooledYou {
