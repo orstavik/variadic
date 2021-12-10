@@ -204,3 +204,7 @@ If the `giftWrap` function is made variadic, then this duality disappears. Once 
 
 1. Are verbs variadic?
 2. Are there any natural languages that have a similar plural+singular case as JavaScript?
+
+## References
+
+1. [Latin plurals: nouns ending in -um](https://oikofuge.com/latin-plurals-nouns-ending-in-um/)
